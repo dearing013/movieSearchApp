@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "movieapp"
+version = "0.1.0"
+description = ""
+authors = ["EricDearing <eric.dearing@linquest.com>"]
+readme = "README.md"
+packages = [{include = "testing"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.10"
+fastapi = "0.109.2"
+uvicorn = "^0.17.0"
+requests = "^2.32.2"
+aiohttp = "^3.9.5"
+sqlalchemy = "^2.0.31"
+psycopg2 = "^2.9.9"
+loguru = "^0.7.2"
+
+[tool.poetry.scripts]
+dev-server = "testing.app:dev_server"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
