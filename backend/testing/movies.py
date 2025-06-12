@@ -161,6 +161,3 @@ def get_movies_by_range(start_year: int,end_year: int,movie_db: Session = Depend
     return results
 
 
-
-
-

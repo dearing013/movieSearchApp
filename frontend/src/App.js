@@ -1,21 +1,22 @@
 import React, { useState, useEffect,useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import MovieList from './components/MovieList';
-import MovieListHeading from './components/MovieListHeading';
-import SearchBox from './components/SearchBox';
+import { BrowserRouter,Navigate, Route, Routes } from "react-router-dom"
 import axios from "axios";
 import {SaveMovieToDb} from "./components/SaveMovieToDb";
 import RemoveFavourites from './components/RemoveFavourites';
 import { StoreContext } from "../src/components/Stores/AppStore";
 import AddFavourite from './components/AddToFavorites';
 import FavouriteMovies from './components/FavouriteMovies';
+import Login from './components/Login';
 import PopUpModal from './components/PopUpModal';
+import Register from './components/Register';
+import NavigationBar from './components/layouts/NavigationBar';
+import MainPage from './MainPage';
 
 const App = () => {
   
-  const [movies, setMovies] = useState([]);
-  const [searchValue, setSearchValue] = useState('');
+  const [movies, setMovies] = useState([]);;
   const [favouritesShown,setFavouritesShown] = useState("")
   const [favourites,setFavourites] = useState([])
   const [description,setDescription] = useState("")
@@ -23,6 +24,11 @@ const App = () => {
   const [movieTitle,setMovieTitle] = useState("")
   const [moviesList,setMoviesList] = useState(false)
   const [state,setState] = useContext(StoreContext)
+
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(
+	() => JSON.parse(localStorage.getItem('loggedIn')) 
+);
 
 
   const getMovieTitle = async (title) => {
@@ -36,26 +42,6 @@ const App = () => {
 	setMovieTitle(res["data"])
 	console.log("returned",res["data"])
   }
-
-  const getMovieRequest = async (searchValue) => {
-
-    const url = `http://www.omdbapi.com/?s=${searchValue}&apikey=652f4f1`;
-   
-		const response = await fetch(url)
-		console.log("help",response)
-		const responseJson = await response.json();
-
-		if (responseJson.Search != null) {
-			console.log("search",responseJson.Search)
-			setMovies(responseJson.Search);
-		}
-  }
-
-  useEffect(() => {
-		getMovieRequest(searchValue);
-	}, [searchValue]);
-
-  
 
 	const saveToLocalStorage = (items) => {
 		localStorage.setItem('react-movie-app-favourites', JSON.stringify(items));
@@ -111,24 +97,28 @@ const App = () => {
 	
 	return (
 	  <div className='container-fluid movie-app'>
+		<NavigationBar />
       <div className='row d-flex align-items-center mt-4 mb-4'>
-			<MovieListHeading heading='Movies' updateFavouritesShown={setFavouritesShown} />
-        <SearchBox searchValue={searchValue} setSearchValue={setSearchValue} />
+			{/* <MovieListHeading heading='Movies' updateFavouritesShown={setFavouritesShown} /> */}
+        
       </div>
-			<div className='row'>
-        		<MovieList movies={movies} page={"results"} favourite={AddFavourite} handleFavouriteClick={addFavouriteMovie}/>
-        	</div>
+		<Routes>
+			<Route path='/Login' element={<Login />} />
+			<Route path='/Register' element={<Register />} />
+			<Route path='/' element={<MainPage />} />
+		</Routes>
+		{/* </BrowserRouter>  */}
 		{/* {localStorage.myFavouritesShown == "true" ? */}
 		{/* <div> */}
         {/* <div className='row d-flex align-items-center mt-4 mb-4'>
 				<MovieListHeading heading='Favourites' updateFavouritesShown={setFavouritesShown}/>
 				
 		</div> */}
-		<div className='row'>
+		{/* <div className='row'>
 			<PopUpModal open={openModal} description={description}  onClose={() => setOpenModal(false)} /> 
 			{/* <MovieList movies={favourites} page={"favourites"} favourite={RemoveFavourites} saveMovie={SaveMovieToDb} removeFavouriteClick={deleteFavouriteMovie} handleFavouriteClick={saveFavouriteMovie} /> */}
 			{/* <FavouriteMovies theList={moviesList} /> */}
-		</div>
+		{/* </div>  */}
 		{/* </div> */}
 		{/* : null } */}
 			</div>

@@ -1,7 +1,7 @@
 import aiohttp
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from testing import movies
+from testing import movies,main
 import uvicorn
 from loguru import logger
 import requests
@@ -9,13 +9,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from testing.connection_pool import USER_AGENT
-from testing.models import movie_models
+from testing.models import movie_models,user_models
 
 root_app = FastAPI()
 app = FastAPI(title="Movie Search App")
 router = APIRouter()
 
 router.include_router(movies.router)
+router.include_router(main.router)
 app.include_router(router)
 
 user = 'postgres'
@@ -61,12 +62,25 @@ def get_app():
             max_overflow=30,
             pool_timeout=60,
         )
+
+        user_engine: Engine = create_engine(
+            "postgresql+psycopg2://postgres:postgres@localhost/Movie Data",
+            pool_pre_ping=True,
+            pool_size=20,
+            max_overflow=30,
+            pool_timeout=60,
+        )
         movie_factory = sessionmaker(movie_engine)
+        user_factory = sessionmaker(user_engine)
 
         app.state.movie_db_engine = movie_engine
+        app.state.user_db_engine = user_engine
+
         app.state.movie_db_factory = movie_factory
+        app.state.user_db_factory = user_factory
         logger.info("Creating tables")
         movie_models.movie_Base.metadata.create_all(bind=movie_engine)
+        user_models.user_Base.metadata.create_all(bind=user_engine)
 
     @root_app.on_event("startup")
     def start_requests_session():

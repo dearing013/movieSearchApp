@@ -1,17 +1,27 @@
 import React,{useContext,useState} from 'react';
 import Box from "@mui/material/Box"
 import MovieIcon from '@mui/icons-material/Movie';
+import AppBar from '@mui/material/AppBar'
+import Login from './Login'
+import { useNavigate } from 'react-router-dom';
 
 const MovieListHeading = (props) => {
 
 	
     // const [state, setState] = useContext(StoreContext);
 
+	const navigate = useNavigate()
+
 
 	const viewFavourites = () => {
 	
 		localStorage.setItem("myFavouritesShown",true)
 		props.updateFavouritesShown("True")
+	}
+
+	const goToLogin = () => {
+		console.log("gotologin")
+		navigate("/Login")
 	}
 
 	const closeFavourites = () => {
@@ -34,6 +44,7 @@ const MovieListHeading = (props) => {
         }}
       >
 			{props.heading == "Movies" ? <MovieIcon fontSize='large'/> : null }
+			<button onClick={goToLogin} >Login</button> 
 			{props.heading == "Movies" ? <button onClick={viewFavourites}>Show my Favourite Movies</button> : null}
 			{props.heading == "Favourites"? <button onClick={closeFavourites}>Close Favourites</button> : null }
 			<h1>{props.heading}</h1>
