@@ -3,7 +3,7 @@ import { SaveMovieToDb } from "./SaveMovieToDb";
 
 
 const MovieList = (props) => {
-    console.log("theprops",props)
+    // console.log("theprops",props)
     const FavouriteComponent = props.favourite;
     const SaveComponent = props.saveMovie;
     return (
@@ -18,7 +18,7 @@ const MovieList = (props) => {
                 <img src={movie.Poster} id={props.imdbID} alt='movie'></img>
                 <div onClick={() => props.handleFavouriteClick(props.page == "favourites"? movie.imdbID : movie)}
                 className='overlay d-flex align-items-center justify-content-start'>
-                        {props.page == "favourites" ? <SaveMovieToDb /> : <FavouriteComponent /> }
+                        {props.page == "favourites" ? null : <FavouriteComponent /> }
 				</div>
             </div>
         ))}

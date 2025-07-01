@@ -1,10 +1,16 @@
 from pydantic import BaseModel
+from uuid import UUID, uuid4
 import datetime
 
 class UserCreate(BaseModel):
+    id: UUID = uuid4()
     username: str
     email: str
     password: str
+
+class FavouriteMovies(BaseModel):
+    title: str
+    user_id: str
 
 class requestdetails(BaseModel):
     email:str

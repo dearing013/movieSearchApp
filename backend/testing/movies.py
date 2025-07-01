@@ -5,7 +5,7 @@ from sqlalchemy import insert, delete, select
 from testing.connection_pool import requests_session,aiohttp_session
 from testing.models.movie_models import MovieDetails
 from sqlalchemy.orm import sessionmaker, Session
-from testing.db import get_movie_db
+from testing.db import get_movie_db,get_user_db
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
@@ -40,7 +40,7 @@ def displayMovie(searchedMovie: str):
     status_code=200,
     summary="save movie to db"
 )
-def saveMovieToDb(title: str,year: str,movie_db: Session = Depends(get_movie_db)):
+def saveMovieToDb(title: str,year: str,imdbid:str,poster:str,userId: int,movie_db: Session = Depends(get_movie_db)):
 
     movie_session = movie_db
 
@@ -48,7 +48,7 @@ def saveMovieToDb(title: str,year: str,movie_db: Session = Depends(get_movie_db)
            MovieDetails.title == title).exists()).scalar()
 
     if not exists:
-        q = insert(MovieDetails).values(title=title,year=year)
+        q = insert(MovieDetails).values(title=title,year=year,imdbID=imdbid,poster=poster,user_id=userId)
 
         res = movie_session.execute(q)
         movie_session.commit()
@@ -159,5 +159,48 @@ def get_movies_by_range(start_year: int,end_year: int,movie_db: Session = Depend
         results.append((row.title))
 
     return results
+
+
+@router.get(
+    "/getMoviesByUser",
+    status_code=200,
+    summary="get all saved favourite movies for a particular user",
+    responses={
+        "404": dict(description="user not found"),
+    },
+)
+
+def get_movies_by_user(userId: int,movie_db: Session = Depends(get_movie_db)):
+
+    results = []
+
+    movie_session = movie_db
+
+    q = select(MovieDetails).where(MovieDetails.user_id == userId)
+    res = movie_session.execute(q)
+
+    rows = res.fetchall()
+    
+    movie_session.commit()
+
+    for row, in rows:
+        results.append(({"Title":row.title,"Year":row.year,"Poster":row.poster,"imdbID":row.imdbID}))
+
+    return results
+
+
+
+
+
+    
+# @router.get(
+#     "/saveFavourites",
+#     status_code=200,
+#     summary="get all movies within a particular range of years",
+#     responses={
+#         "404": dict(description="No Movies Found"),
+#     },
+# )
+# /
 
 

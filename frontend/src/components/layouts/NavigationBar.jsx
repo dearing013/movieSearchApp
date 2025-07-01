@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import {
   Stack,
   Link,
@@ -6,6 +6,7 @@ import {
   Typography,
   Container,
   AppBar,
+  Button
 } from "@mui/material";
 import Login from "../Login";
 import { NavLink,useNavigate } from "react-router-dom";
@@ -28,12 +29,14 @@ const NavigationBar = () => {
     console.log("logout")
     setState(state => ({ ...state,isLoggedIn: false}));
     localStorage.setItem("loggedIn",false)
+    navigate("/")
     console.log("test",localStorage.loggedIn)
   }
 
+
   const logIn = () => {
-    localStorage.setItem("loggedIn",true)
     setState(state => ({ ...state,isLoggedIn: true}));
+    console.log("help",state)
     navigate("/Login")
   }
 
@@ -50,18 +53,24 @@ const NavigationBar = () => {
             <Typography variant="h6">Movie Search</Typography>
             <Stack direction="row" gap={3}>
               
-                {!state.isLoggedIn ? <button onClick={logIn}>Login</button> : <button onClick={logOff} >Logout</button>}
-                {/* <Link
-
-                  to="/Login"
-                  // component={NavLink}
-                  sx={{
-                    color: { xs: "primary", sm: "white" },
-                  }}
-                >
-                  Login
-                </Link> */}
-            
+                {window.location.pathname != "/Login" && localStorage.loggedIn == 'false' ? <Button sx={{marginRight:"15px",
+                    fontSize: 14.5,
+                    backgroundColor: "black", 
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "grey",
+                    }
+                    }} onClick={logIn}>Login</Button> : window.location.pathname != "/Login" && localStorage.loggedIn == 'true' ? <Button sx={{ 
+                    marginRight:"15px",
+                    fontSize: 14.5,
+                    backgroundColor: "black", 
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "grey",
+                    }
+                    
+                  }} onClick={logOff} >Logout</Button> : null }
+  
             </Stack>
           </Stack>
         </Toolbar>

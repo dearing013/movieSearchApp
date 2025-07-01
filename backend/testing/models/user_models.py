@@ -9,6 +9,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Boolean,
+    UUID
 )
 from testing.db import user_Base
 
@@ -17,6 +18,7 @@ class UserDetails(user_Base):
     __tablename__ = "user_profile"
 
     id = Column(Integer,primary_key=True)
+    # id = Column(UUID(as_uuid=True), primary_key=True)
     username = Column(String, nullable=False)
     email = Column(String,unique=True,nullable=False)
     password = Column(String,nullable=False)

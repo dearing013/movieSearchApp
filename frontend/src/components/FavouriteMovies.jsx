@@ -9,25 +9,41 @@ import PopUpModal from "./PopUpModal";
 
 function FavouriteMovies (props) {
 
-    const [favourites,setFavourites] = useState([]);
+    const [favouriteMovies,setFavouriteMovies] = useState([]);
     const [description,setDescription] = useState("")
     const [openModal,setOpenModal] = useState(false)
     const [selectedMovieTitle,setSelectedMovieTitle] = useState("");
     const [selectedMovieYear,setSelectedMovieYear] = useState("")
     const [state,setState] = useContext(StoreContext);
 
+    // useEffect(() => {
+    //     const movieFavourites = JSON.parse(
+    //         localStorage.getItem('react-movie-app-favourites')
+    //     );
+    //     if (movieFavourites) {
+    //         setFavouriteMovies(movieFavourites);
+    //     }
+    // },[]);
     useEffect(() => {
-        const movieFavourites = JSON.parse(
-            localStorage.getItem('react-movie-app-favourites')
-        );
-        if (movieFavourites) {
-            setFavourites(movieFavourites);
-        }
-    },[]);
+        console.log("updateddata",props.updates)
+        // getAllFavourites()
+        setFavouriteMovies(props.updates)
+        console.log("compare",props.updates === favouriteMovies)
+        getAllFavourites()
+      },[props.updates]);
 
     useEffect(() => {
       console.log("update")
     },[props.theList]);
+
+    useEffect(() => {
+        getAllFavourites()
+        console.log("test")
+    },[])
+
+    // useEffect(() => {
+    //     console.log("favouritechanges")
+    // },[fa]
 
 
     const saveToLocalStorage = (items) => {
@@ -35,57 +51,51 @@ function FavouriteMovies (props) {
         const movieFavourites = JSON.parse(
             localStorage.getItem('react-movie-app-favourites')
         );
-        if (movieFavourites) {
-            setFavourites(movieFavourites);
-        }
+        // if (movieFavourites) {
+        //     setFavouriteMovies(movieFavourites);
+        // }
 	};
-
+    
     const getAllFavourites = async () => {
 
-        const results = await axios.get("http://127.0.0.1:8003/movieSearch/movies/getAllFavouriteMovies")
-
-        console.log(results)
-    }
-
-
-    const saveFavouriteMovie = (id) => {
- 
-        const selectedMovie = favourites.filter(
-            (favourite) => favourite.imdbID == id
-        )
-        setSelectedMovieTitle(selectedMovie[0].Title)
-        setSelectedMovieYear(selectedMovie[0].Year)
-        console.log("selected",selectedMovieTitle)
-    
-
-        axios.post(`http://127.0.0.1:8003/movieSearch/movies/saveMovie?title=${selectedMovie[0].Title}&year=${selectedMovie[0].Year}`,
-        {
-            headers: {'Accept': 'application/json','Content-Type': 'application/json'}   
+        try {
+            const results = await axios.get(`http://127.0.0.1:8003/movieSearch/movies/getMoviesByUser?userId=${localStorage.userId}`)
+                // setFavourites(results.data)
+            //need to convert result into proper format for displaying on page
+                // console.log("theresults",results)
+                var newFavouriteList = [...favouriteMovies,results.data]
+                // console.log("newfavour",newFavouriteList)
+                setFavouriteMovies(results.data)
+                console.log("asnwer",favouriteMovies)
         }
-        )
-        setDescription("Movie Saved Successfully")
-        setOpenModal(true);
+
+        catch (e) {
+            console.log("error retrieving favorite movies")
+        }
     }
 
     const deleteFavouriteMovie = async (title) => {
         const deletedMovie = await axios.get(`http://127.0.0.1:8003/movieSearch/movies/removeMovie?title=${title}`)
 
-        const newFavouriteList = favourites.filter(
+        const newFavouriteList = favouriteMovies.filter(
             (favourite) => favourite.Title !== title
         );
 
-        setFavourites(newFavouriteList);
+        setFavouriteMovies(newFavouriteList);
         saveToLocalStorage(newFavouriteList);
         setDescription("Movie Removed Successfully")
         setOpenModal(true);
     }
 
     return (
-        <div className='image-container d-flex '>
-            {/* <button onClick={getAllFavourites}>Get All Favourites</button> */}
+        <>
+         <h1>Your Favourite Movies</h1>
+         <br></br>
+        <div className='image-container d-flex justify-content space-between m-4 '>
             <PopUpModal open={openModal} description={description}  onClose={() => setOpenModal(false)} /> 
-            {/* <MovieList movies={favourites} page={"favourites"} favourite={RemoveFavourites} saveMovie={SaveMovieToDb} removeFavouriteClick={deleteFavouriteMovie} handleFavouriteClick={saveFavouriteMovie} /> */}
+            <MovieList movies={favouriteMovies} page={"favourites"} favourite={RemoveFavourites}  removeFavouriteClick={deleteFavouriteMovie}  /> 
         </div>
+        </>
     )
 }
 export default FavouriteMovies;
