@@ -1,22 +1,22 @@
 import aiohttp
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from testing import movies,main
+from data import movies,users
 import uvicorn
 from loguru import logger
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
-from testing.connection_pool import USER_AGENT
-from testing.models import movie_models,user_models
+from data.connection_pool import USER_AGENT
+from data.models import movie_models,user_models
 
 root_app = FastAPI()
 app = FastAPI(title="Movie Search App")
 router = APIRouter()
 
 router.include_router(movies.router)
-router.include_router(main.router)
+router.include_router(users.router)
 app.include_router(router)
 
 user = 'postgres'
@@ -28,6 +28,7 @@ database = 'pricing'
 
 origins = [
     "http://localhost:3006",
+    "http://localhost:3000"
 ]
 
 app.add_middleware(
@@ -116,7 +117,7 @@ def dev_server():
     """Entry point for running the dev server."""
 
     uvicorn.run(
-        "testing.app:get_app",
+        "data.app:get_app",
         factory=True,
         forwarded_allow_ips="0.0.0.0/0",
         host="0.0.0.0",

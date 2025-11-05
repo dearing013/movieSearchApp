@@ -6,6 +6,7 @@ import { StoreContext } from "./Stores/AppStore";
 import RemoveFavourites from "./RemoveFavourites";
 import {SaveMovieToDb} from "./SaveMovieToDb";
 import PopUpModal from "./PopUpModal";
+import { useSelector } from 'react-redux';
 
 function FavouriteMovies (props) {
 
@@ -16,35 +17,22 @@ function FavouriteMovies (props) {
     const [selectedMovieYear,setSelectedMovieYear] = useState("")
     const [state,setState] = useContext(StoreContext);
 
-    // useEffect(() => {
-    //     const movieFavourites = JSON.parse(
-    //         localStorage.getItem('react-movie-app-favourites')
-    //     );
-    //     if (movieFavourites) {
-    //         setFavouriteMovies(movieFavourites);
-    //     }
-    // },[]);
+
     useEffect(() => {
-        console.log("updateddata",props.updates)
-        // getAllFavourites()
-        setFavouriteMovies(props.updates)
+             const movieFavourites = JSON.parse(
+            localStorage.getItem('react-movie-app-favourites')
+        );
+        if (movieFavourites) {
+            setFavouriteMovies(movieFavourites);
+        }
         console.log("compare",props.updates === favouriteMovies)
-        getAllFavourites()
+        setTimeout(() => getAllFavourites(),2000)
       },[props.updates]);
 
     useEffect(() => {
-      console.log("update")
-    },[props.theList]);
-
-    useEffect(() => {
         getAllFavourites()
-        console.log("test")
     },[])
-
-    // useEffect(() => {
-    //     console.log("favouritechanges")
-    // },[fa]
-
+    
 
     const saveToLocalStorage = (items) => {
 		localStorage.setItem('react-movie-app-favourites', JSON.stringify(items));
@@ -57,16 +45,12 @@ function FavouriteMovies (props) {
 	};
     
     const getAllFavourites = async () => {
-
         try {
             const results = await axios.get(`http://127.0.0.1:8003/movieSearch/movies/getMoviesByUser?userId=${localStorage.userId}`)
-                // setFavourites(results.data)
-            //need to convert result into proper format for displaying on page
-                // console.log("theresults",results)
-                var newFavouriteList = [...favouriteMovies,results.data]
-                // console.log("newfavour",newFavouriteList)
-                setFavouriteMovies(results.data)
-                console.log("asnwer",favouriteMovies)
+            console.log("theresults",results.data)
+       
+            setFavouriteMovies(results.data)
+            console.log("asnwer",favouriteMovies)
         }
 
         catch (e) {
@@ -75,8 +59,9 @@ function FavouriteMovies (props) {
     }
 
     const deleteFavouriteMovie = async (title) => {
-        const deletedMovie = await axios.get(`http://127.0.0.1:8003/movieSearch/movies/removeMovie?title=${title}`)
+        const deletedMovie = await axios.delete(`http://127.0.0.1:8003/movieSearch/movies/deleteMovie?title=${title}`)
 
+        getAllFavourites()
         const newFavouriteList = favouriteMovies.filter(
             (favourite) => favourite.Title !== title
         );
@@ -86,16 +71,17 @@ function FavouriteMovies (props) {
         setDescription("Movie Removed Successfully")
         setOpenModal(true);
     }
+    
 
     return (
         <>
-         <h1>Your Favourite Movies</h1>
+        <h1>{localStorage.userName}'s Favourite Movies</h1> 
          <br></br>
         <div className='image-container d-flex justify-content space-between m-4 '>
             <PopUpModal open={openModal} description={description}  onClose={() => setOpenModal(false)} /> 
             <MovieList movies={favouriteMovies} page={"favourites"} favourite={RemoveFavourites}  removeFavouriteClick={deleteFavouriteMovie}  /> 
-        </div>
+        </div> 
         </>
-    )
+    )  
 }
 export default FavouriteMovies;

@@ -1,11 +1,11 @@
 import aiohttp
 from fastapi import APIRouter
 from fastapi.params import Depends
-from sqlalchemy import insert, delete, select
-from testing.connection_pool import requests_session,aiohttp_session
-from testing.models.movie_models import MovieDetails
+from sqlalchemy import insert, delete, select,or_
+from data.connection_pool import requests_session,aiohttp_session
+from data.models.movie_models import MovieDetails
 from sqlalchemy.orm import sessionmaker, Session
-from testing.db import get_movie_db,get_user_db
+from data.db import get_movie_db,get_user_db
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
@@ -40,7 +40,7 @@ def displayMovie(searchedMovie: str):
     status_code=200,
     summary="save movie to db"
 )
-def saveMovieToDb(title: str,year: str,imdbid:str,poster:str,userId: int,movie_db: Session = Depends(get_movie_db)):
+def saveMovieToDb(title: str,startYear:str,endYear:str,imdbid:str,poster:str,userId: int,movie_db: Session = Depends(get_movie_db)):
 
     movie_session = movie_db
 
@@ -48,7 +48,7 @@ def saveMovieToDb(title: str,year: str,imdbid:str,poster:str,userId: int,movie_d
            MovieDetails.title == title).exists()).scalar()
 
     if not exists:
-        q = insert(MovieDetails).values(title=title,year=year,imdbID=imdbid,poster=poster,user_id=userId)
+        q = insert(MovieDetails).values(title=title,start_year=startYear,end_year=endYear,imdbID=imdbid,poster=poster,user_id=userId)
 
         res = movie_session.execute(q)
         movie_session.commit()
@@ -56,15 +56,15 @@ def saveMovieToDb(title: str,year: str,imdbid:str,poster:str,userId: int,movie_d
 
         return {"movie successfully added"}
 
-@router.get(
-    "/removeMovie",
+@router.delete(
+    "/deleteMovie",
     status_code=200,
     summary="delete movie",
     responses={
         "404": dict(description="Movie Not Found"),
     },
 )
-def removeMovies(title: str,movie_db: Session = Depends(get_movie_db)):
+def deleteMovie(title: str,movie_db: Session = Depends(get_movie_db)):
 
     movie_session = movie_db
 
@@ -118,7 +118,13 @@ def get_movies_by_year(year: int,movie_db: Session = Depends(get_movie_db),):
 
     movie_session = movie_db
 
-    q = select(MovieDetails).where(MovieDetails.year == year)
+    q = select(MovieDetails).where(or_(
+        MovieDetails.start_year == year,
+        MovieDetails.end_year  == year
+    ))
+
+    
+    # (MovieDetails.start_year == year or MovieDetails.end_year == year)
 
     res = movie_session.execute(q)
 
@@ -148,7 +154,7 @@ def get_movies_by_range(start_year: int,end_year: int,movie_db: Session = Depend
     movie_session = movie_db
 
 
-    q = select(MovieDetails).where(MovieDetails.year >= start_year,MovieDetails.year <= end_year)
+    q = select(MovieDetails).where(MovieDetails.start_year >= start_year,MovieDetails.end_year <= end_year)
     res = movie_session.execute(q)
 
     rows = res.fetchall()
@@ -184,13 +190,17 @@ def get_movies_by_user(userId: int,movie_db: Session = Depends(get_movie_db)):
     movie_session.commit()
 
     for row, in rows:
-        results.append(({"Title":row.title,"Year":row.year,"Poster":row.poster,"imdbID":row.imdbID}))
+        results.append(({"Title":row.title,"StartYear":row.start_year,"EndYear": row.end_year,"Poster":row.poster,"imdbID":row.imdbID}))
 
     return results
 
+# def get_user_by_id()
+  
 
 
 
+
+# def get_movies_by_user 
 
     
 # @router.get(

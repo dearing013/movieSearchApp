@@ -7,7 +7,6 @@ const MovieList = (props) => {
     const FavouriteComponent = props.favourite;
     const SaveComponent = props.saveMovie;
     return (
-
         <>
         {props.movies.map((movie, index) => (
             <div className='image-container d-flex justify-content-space-between m-4'>

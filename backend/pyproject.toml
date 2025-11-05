@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["EricDearing <eric.dearing@linquest.com>"]
 readme = "README.md"
-packages = [{include = "testing"}]
+packages = [{include = "data"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.10"
@@ -19,7 +19,7 @@ passlib = "^1.7.4"
 bcrypt = "^4.3.0"
 
 [tool.poetry.scripts]
-dev-server = "testing.app:dev_server"
+dev-server = "data.app:dev_server"
 
 
 [build-system]

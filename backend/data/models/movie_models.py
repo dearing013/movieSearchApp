@@ -10,7 +10,7 @@ from sqlalchemy import (
     DateTime,
     Boolean,
 )
-from testing.db import movie_Base
+from data.db import movie_Base
 
 
 class MovieDetails(movie_Base):
@@ -18,6 +18,8 @@ class MovieDetails(movie_Base):
 
     title: str = Column(String,primary_key=True)
     user_id: int = Column(Integer,nullable=False)
-    year: int = Column(Integer, nullable=False)
+    # year: int = Column(String, nullable=False)
+    start_year: int = Column(Integer, nullable=False)
+    end_year: int = Column(Integer, nullable=False)
     poster: str = Column(String,nullable=False)
     imdbID: str = Column(String(100),nullable=False)

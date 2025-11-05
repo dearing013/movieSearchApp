@@ -11,7 +11,7 @@ from sqlalchemy import (
     Boolean,
     UUID
 )
-from testing.db import user_Base
+from data.db import user_Base
 
 
 class UserDetails(user_Base):

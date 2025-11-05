@@ -11,6 +11,10 @@ import {
 import Login from "../Login";
 import { NavLink,useNavigate } from "react-router-dom";
 import { StoreContext } from "../Stores/ContextStore";
+import { useDispatch } from 'react-redux';
+import {logout } from '../Stores/authSlice';
+
+  
 // const pages = [
 //   { name: "Products", id: "products" },
 //   { name: "Services", id: "services" },
@@ -23,11 +27,13 @@ import { StoreContext } from "../Stores/ContextStore";
 const NavigationBar = () => {
 
   const navigate = useNavigate()
+  const dispatch = useDispatch();
   const [state, setState] = useContext(StoreContext);
 
   const logOff = () => {
     console.log("logout")
     setState(state => ({ ...state,isLoggedIn: false}));
+    dispatch(logout());
     localStorage.setItem("loggedIn",false)
     navigate("/")
     console.log("test",localStorage.loggedIn)
@@ -40,6 +46,13 @@ const NavigationBar = () => {
     navigate("/Login")
   }
 
+  const navigateToHome  = () => {
+
+    navigate("/")
+    setState(state => ({}))
+
+  }
+
   return (
     <AppBar>
       <Container>
@@ -50,17 +63,18 @@ const NavigationBar = () => {
             alignItems="center"
             width="100%"
           >
-            <Typography variant="h6">Movie Search</Typography>
+            <Typography variant="h6">Movie and TV Search</Typography>
             <Stack direction="row" gap={3}>
-              
-                {window.location.pathname != "/Login" && localStorage.loggedIn == 'false' ? <Button sx={{marginRight:"15px",
+              {window.location.pathname != "/Login" && localStorage.loggedIn == 'false' ? 
+                 <Button sx={{marginRight:"15px",
                     fontSize: 14.5,
                     backgroundColor: "black", 
                     color: "white",
                     "&:hover": {
                       backgroundColor: "grey",
                     }
-                    }} onClick={logIn}>Login</Button> : window.location.pathname != "/Login" && localStorage.loggedIn == 'true' ? <Button sx={{ 
+                    }} onClick={logIn}>Login</Button>  
+                    : window.location.pathname != "/Login" && localStorage.loggedIn == 'true' ? <Button sx={{ 
                     marginRight:"15px",
                     fontSize: 14.5,
                     backgroundColor: "black", 
@@ -70,6 +84,7 @@ const NavigationBar = () => {
                     }
                     
                   }} onClick={logOff} >Logout</Button> : null }
+                  {window.location.pathname == "/Login" ? <Button onClick={navigateToHome}>Go Home</Button> : null }
   
             </Stack>
           </Stack>

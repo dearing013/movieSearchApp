@@ -1,12 +1,12 @@
-from testing.schemas import UserCreate,requestdetails,TokenSchema
+from data.schemas import UserCreate,requestdetails,TokenSchema
 # from models import User
 # from database import Base, engine, SessionLocal
 from fastapi import FastAPI, Depends, HTTPException,status,APIRouter
 from sqlalchemy.orm import Session
-from sqlalchemy import select
-from testing.db import get_user_db
-from testing.models.user_models import UserDetails
-from testing.utils import get_hashed_password,verify_password
+from sqlalchemy import select,delete
+from data.db import get_user_db
+from data.models.user_models import UserDetails
+from data.utils import get_hashed_password,verify_password
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -67,6 +67,41 @@ def get_user_by_id(userId: int,user_db: Session = Depends(get_user_db)):
 
     return results
 
+@router.delete("/deleteUser",
+  status_code=200,
+    summary="delete user by id",
+    responses={
+        "404": dict(description="User not found")
+    })
+def delete_user_by_id(userId: int,user_db: Session = Depends(get_user_db)):
+
+    user_session = user_db
+
+    q = delete(UserDetails).where(UserDetails.id == userId)
+
+    user_session.execute(q)
+
+    # rows = res.fetchall()
+
+    user_session.commit()
+
+    # if rows:
+    #     user_session.delete(row)
+    #     user_session.commit()
+    return {"user successfully deleted"}
+    # else:
+    #     return {"user not found"}
+    
+    # q = delete(UserDetails).where(UserDetails.id == userId)
+    # res = user_session.execute(q)
+
+    # user_session.commit()
+
+    # return {"user successfully deleted"}
+
+    
+
+    
 
 # @router.post("/changePassword")
 # def changePassord(request: RequestDetails):
