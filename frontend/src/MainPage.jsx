@@ -17,9 +17,10 @@ function MainPage () {
     const [openModal,setOpenModal] = useState(false);
     const [description,setDescription] = useState("");
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-
     
     const API_URL = process.env.REACT_APP_API_URL;
+    const OMDB_URL = process.env.REACT_APP_OMDB_URL;
+
     console.log("env",process.env)
 
 
@@ -63,7 +64,7 @@ function MainPage () {
 
     const getMovieRequest = async (searchValue) => {
 
-        const url = `https://www.omdbapi.com/?s=${searchValue}&apikey=652f4f1`;
+        const url = `${OMDB_URL}/?s=${searchValue}&apikey=652f4f1`;
 
         try {
        
