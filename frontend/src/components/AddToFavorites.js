@@ -10,7 +10,7 @@ const AddFavourite = () => {
 				viewBox='0 0 16 16'
 				class='bi bi-heart-fill'
 				fill='red'
-				xmlns='http://www.w3.org/2000/svg'
+				xmlns='https://www.w3.org/2000/svg'
 			>
 				<path
 					fill-rule='evenodd'

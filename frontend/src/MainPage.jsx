@@ -18,6 +18,10 @@ function MainPage () {
     const [description,setDescription] = useState("");
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
+    
+    const API_URL = process.env.REACT_APP_API_URL;
+    console.log("env",process.env)
+
 
     const saveFavouriteMovie = (movie) => {
     
@@ -38,7 +42,7 @@ function MainPage () {
            
 
             try {
-                axios.post(`http://127.0.0.1:8003/movieSearch/movies/saveMovie?title=${selectedMovie[0].Title}&startYear=${startYear}&endYear=${endYear}&imdbid=${selectedMovie[0].imdbID}&poster=${selectedMovie[0].Poster}&userId=${localStorage.userId}`,
+                axios.post(`${API_URL}/movieSearch/movies/saveMovie?title=${selectedMovie[0].Title}&startYear=${startYear}&endYear=${endYear}&imdbid=${selectedMovie[0].imdbID}&poster=${selectedMovie[0].Poster}&userId=${localStorage.userId}`,
                 {
                     headers: {'Accept': 'application/json','Content-Type': 'application/json'}   
                 }
@@ -59,7 +63,7 @@ function MainPage () {
 
     const getMovieRequest = async (searchValue) => {
 
-        const url = `http://www.omdbapi.com/?s=${searchValue}&apikey=652f4f1`;
+        const url = `https://www.omdbapi.com/?s=${searchValue}&apikey=652f4f1`;
 
         try {
        

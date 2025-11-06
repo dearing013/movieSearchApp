@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react"
 import PopUpModal from '../components/PopUpModal';
 import { useNavigate } from "react-router-dom";
-import { Grid,Paper, Avatar, TextField, Button, Typography,Link } from '@mui/material'
+import { Grid,Paper, Typography,Link } from '@mui/material'
 import { useDispatch } from 'react-redux';
 import {login} from "./Stores/authSlice";
 
@@ -24,10 +24,16 @@ function Login () {
     const avatarStyle={backgroundColor:'#1bbd7e'}
     const btnstyle={margin:'8px 0'}
 
+    
+    const API_URL = process.env.REACT_APP_API_URL;
+
+
+
+
     const loginUser = async () => {
 
         try {
-            const res = await axios.post("http://127.0.0.1:8003/movieSearch/users/login",   
+            const res = await axios.post(`${API_URL}/movieSearch/users/login`,   
             JSON.stringify({email,password}),
             {
                 headers: {'Accept': 'application/json','Content-Type': 'application/json'},   

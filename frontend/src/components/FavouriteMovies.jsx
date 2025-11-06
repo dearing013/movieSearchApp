@@ -17,6 +17,8 @@ function FavouriteMovies (props) {
     const [selectedMovieYear,setSelectedMovieYear] = useState("")
     const [state,setState] = useContext(StoreContext);
 
+    const API_URL = process.env.REACT_APP_API_URL;
+
 
     useEffect(() => {
              const movieFavourites = JSON.parse(
@@ -46,7 +48,7 @@ function FavouriteMovies (props) {
     
     const getAllFavourites = async () => {
         try {
-            const results = await axios.get(`http://127.0.0.1:8003/movieSearch/movies/getMoviesByUser?userId=${localStorage.userId}`)
+            const results = await axios.get(`${API_URL}/movieSearch/movies/getMoviesByUser?userId=${localStorage.userId}`)
             console.log("theresults",results.data)
        
             setFavouriteMovies(results.data)
@@ -59,7 +61,7 @@ function FavouriteMovies (props) {
     }
 
     const deleteFavouriteMovie = async (title) => {
-        const deletedMovie = await axios.delete(`http://127.0.0.1:8003/movieSearch/movies/deleteMovie?title=${title}`)
+        const deletedMovie = await axios.delete(`${API_URL}movieSearch/movies/deleteMovie?title=${title}`)
 
         getAllFavourites()
         const newFavouriteList = favouriteMovies.filter(

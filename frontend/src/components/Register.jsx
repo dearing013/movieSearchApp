@@ -15,6 +15,10 @@ function Register () {
     const avatarStyle={backgroundColor:'#1bbd7e'}
     const btnstyle={margin:'8px 0'}
 
+    const API_URL = process.env.REACT_APP_API_URL;
+
+
+
 
 
     
@@ -48,7 +52,7 @@ function Register () {
     const registerUser = async () => {
         try {
             console.log("isthiscalled")
-            const res = await axios.post("http://127.0.0.1:8003/movieSearch/users/register", 
+            const res = await axios.post(`${API_URL}/movieSearch/users/register`, 
             JSON.stringify({username,email,password}),
             {
                 headers: {'Accept': 'application/json','Content-Type': 'application/json'},   

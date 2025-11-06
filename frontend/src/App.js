@@ -31,26 +31,26 @@ const App = () => {
 );
 
 
-  const getMovieTitle = async (title) => {
-	console.log("thetitle",title)
+//   const getMovieTitle = async (title) => {
+// 	console.log("thetitle",title)
 
-	const res = await axios.post(`http://127.0.0.1:8003/movieSearch/movies/listmovie?searchedMovie=${title}`,
-	{
-		headers: {'Accept': 'application/json','Content-Type': 'application/json'},   
-	}
-	);
-	setMovieTitle(res["data"])
-	console.log("returned",res["data"])
-  }
+// 	const res = await axios.post(`http://127.0.0.1:8003/movieSearch/movies/listmovie?searchedMovie=${title}`,
+// 	{
+// 		headers: {'Accept': 'application/json','Content-Type': 'application/json'},   
+// 	}
+// 	);
+// 	setMovieTitle(res["data"])
+// 	console.log("returned",res["data"])
+//   }
 
 	const saveToLocalStorage = (items) => {
 		localStorage.setItem('react-movie-app-favourites', JSON.stringify(items));
 	};
 
-	const filterMovieByYearRange = (start_year,end_year) => {
-		axios.get(`http://127.0.0.1:8003/movieSearch/movies/getMoviesByRange?start_year=${start_year}&end_year=${end_year}`)
+	// const filterMovieByYearRange = (start_year,end_year) => {
+	// 	axios.get(`http://127.0.0.1:8003/movieSearch/movies/getMoviesByRange?start_year=${start_year}&end_year=${end_year}`)
 	
-	}
+	// }
 	
 	
 	return (
