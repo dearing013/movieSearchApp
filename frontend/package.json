@@ -28,7 +28,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -b main -d build",
+    "deploy": "gh-pages -d build -r https://x-access-token:${GITHUB_TOKEN}@github.com/dearing013/movieSearchApp.git",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
