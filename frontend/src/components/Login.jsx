@@ -2,9 +2,7 @@ import axios from "axios";
 import React, { useState } from "react"
 import PopUpModal from '../components/PopUpModal';
 import { useNavigate } from "react-router-dom";
-import { Grid,Paper, Avatar, TextField, Button, Typography,Link } from '@material-ui/core'
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import { Grid,Paper, Avatar, TextField, Button, Typography,Link } from '@mui/material'
 import { useDispatch } from 'react-redux';
 import {login} from "./Stores/authSlice";
 
