@@ -1,20 +1,8 @@
 import axios from "axios";
-import React,{useState} from "react"
-import { Navigate, useNavigate } from "react-router-dom";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
+import {useState} from "react"
+import {useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import { Paper } from "@mui/material";
-// import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@mui/material/Typography";
-import { makeStyles } from "@mui/styles";
-import Container from '@mui/material/Container';
 
 function Register () {
 
@@ -92,7 +80,6 @@ function Register () {
               <Grid>
             <Paper elevation={10} style={paperStyle}>
                 <Grid align='center'>
-                     {/* <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar> */}
                     <h2>Register</h2>
                 </Grid>
                  <label>UserName</label>
@@ -104,28 +91,9 @@ function Register () {
             {/* <input  onChange={(e) => setPassword(e.target.value)} type="password" style={{width: "250px"}} ></input> */}
               <label>password</label><input onChange={(e) => setPassword(e.target.value)} type="text"></input>
             <label>Confirm Password</label><input type="text"></input>
-        {/* <Container component="main" maxWidth="xs">
-            <CssBaseline />
-        {/* <div style={{marginTop: "200px",display: "flex",flexDirection: "column"}}>  */}
-        {/* <form > */}
-          {/* <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-            <label>Username</label><input onChange={handleUserNameChange} type="text"></input>
+     
         
-            {/* <div style={{marginLeft: "200px"}}> */}
-            {/* <label>Email</label><input onChange={(e) => setEmail(e.target.value)} type="text"></input>
-            </div>  */}
-             
-          
-          
-        {/* </div>  */}
-         {/* </Grid> 
-          </Grid> */}
-        {/* </form> */}
           <button onClick={registerUser}>Register</button>
-
-        {/* </Container> */}
-       
         </Paper>
          </Grid>
     
