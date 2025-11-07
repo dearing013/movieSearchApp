@@ -5,6 +5,7 @@ from data import movies,users
 import uvicorn
 from loguru import logger
 import requests
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
@@ -56,22 +57,21 @@ def get_app():
     @root_app.on_event("startup")
     def connect_db():
         logger.info("Creating database engines")
+
+        db_url = os.environ.get(
+            "DATABASE_URL",
+            "postgresql+psycopg2://postgres:postgres@localhost/Movie Data"
+        )
        
         movie_engine: Engine = create_engine(
-            "postgresql+psycopg2://postgres:postgres@localhost/Movie Data",
+            db_url,
             pool_pre_ping=True,
             pool_size=20,
             max_overflow=30,
             pool_timeout=60,
         )
 
-        user_engine: Engine = create_engine(
-            "postgresql+psycopg2://postgres:postgres@localhost/Movie Data",
-            pool_pre_ping=True,
-            pool_size=20,
-            max_overflow=30,
-            pool_timeout=60,
-        )
+        user_engine: Engined = movie_engine
         movie_factory = sessionmaker(movie_engine)
         user_factory = sessionmaker(user_engine)
 

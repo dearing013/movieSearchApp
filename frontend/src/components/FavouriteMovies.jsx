@@ -61,7 +61,7 @@ function FavouriteMovies (props) {
     }
 
     const deleteFavouriteMovie = async (title) => {
-        const deletedMovie = await axios.delete(`${API_URL}movieSearch/movies/deleteMovie?title=${title}`)
+        const deletedMovie = await axios.delete(`${API_URL}/movieSearch/movies/deleteMovie?title=${title}`)
 
         getAllFavourites()
         const newFavouriteList = favouriteMovies.filter(
