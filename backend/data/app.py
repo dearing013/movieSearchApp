@@ -29,7 +29,7 @@ database = 'pricing'
 origins = [
     "http://localhost:3006",
     "http://localhost:3000",
-    "https://dearing013.github.io/movieSearchApp"
+    "https://dearing013.github.io"
 ]
 
 app.add_middleware(
