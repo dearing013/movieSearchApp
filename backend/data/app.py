@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from data.connection_pool import USER_AGENT
 from data.models import movie_models,user_models
 from dotenv import load_dotenv
+import traceback
 
 
 root_app = FastAPI()
