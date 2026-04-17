@@ -75,7 +75,7 @@ def get_app():
         if "localhost" not in db_url:
             connect_args["sslmode"] = "require"
 
-       
+        print("DB URL:", db_url)
         movie_engine: Engine = create_engine(
             db_url,
             pool_pre_ping=True,
