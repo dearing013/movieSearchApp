@@ -1,21 +1,16 @@
-import React,{useState,useEffect,useContext} from "react";
+import {useState,useEffect} from "react";
 import MovieList from './MovieList';
 import '../App.css';
 import axios from "axios";
-import { StoreContext } from "./Stores/AppStore";
 import RemoveFavourites from "./RemoveFavourites";
-import {SaveMovieToDb} from "./SaveMovieToDb";
 import PopUpModal from "./PopUpModal";
-import { useSelector } from 'react-redux';
 
 function FavouriteMovies (props) {
 
     const [favouriteMovies,setFavouriteMovies] = useState([]);
+    const [textColor,setTextColor] = useState("")
     const [description,setDescription] = useState("")
     const [openModal,setOpenModal] = useState(false)
-    const [selectedMovieTitle,setSelectedMovieTitle] = useState("");
-    const [selectedMovieYear,setSelectedMovieYear] = useState("")
-    const [state,setState] = useContext(StoreContext);
 
     const API_URL = process.env.REACT_APP_API_URL;
 
@@ -27,7 +22,6 @@ function FavouriteMovies (props) {
         if (movieFavourites) {
             setFavouriteMovies(movieFavourites);
         }
-        console.log("compare",props.updates === favouriteMovies)
         setTimeout(() => getAllFavourites(),2000)
       },[props.updates]);
 
@@ -70,6 +64,7 @@ function FavouriteMovies (props) {
 
         setFavouriteMovies(newFavouriteList);
         saveToLocalStorage(newFavouriteList);
+        setTextColor("Green")
         setDescription("Movie Removed Successfully")
         setOpenModal(true);
     }
@@ -77,10 +72,10 @@ function FavouriteMovies (props) {
 
     return (
         <>
-        <h1>{localStorage.userName}'s Favourite Movies</h1> 
+        <h1>{localStorage.userName}'s Favourite Movies and Shows</h1> 
          <br></br>
         <div className='image-container d-flex justify-content space-between m-4 '>
-            <PopUpModal open={openModal} description={description}  onClose={() => setOpenModal(false)} /> 
+            <PopUpModal open={openModal} color={textColor} description={description}  onClose={() => setOpenModal(false)} /> 
             <MovieList movies={favouriteMovies} page={"favourites"} favourite={RemoveFavourites}  removeFavouriteClick={deleteFavouriteMovie}  /> 
         </div> 
         </>

@@ -11,10 +11,13 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from data.connection_pool import USER_AGENT
 from data.models import movie_models,user_models
+from dotenv import load_dotenv
+
 
 root_app = FastAPI()
 app = FastAPI(title="Movie Search App")
 router = APIRouter()
+
 
 router.include_router(movies.router)
 router.include_router(users.router)
@@ -58,14 +61,25 @@ def get_app():
     def connect_db():
         logger.info("Creating database engines")
 
+        load_dotenv()
+
         db_url = os.environ.get(
-            "DATABASE_URL",
-            "postgresql+psycopg2://postgres:postgres@localhost/Movie Data"
+            "DATABASE_URL"
         )
+        
+        if not db_url:
+            raise ValueError("DATABASE_URL is not set")
+        
+        connect_args = {}
+
+        if "localhost" not in db_url:
+            connect_args["sslmode"] = "require"
+
        
         movie_engine: Engine = create_engine(
             db_url,
             pool_pre_ping=True,
+            connect_args=connect_args,
             pool_size=20,
             max_overflow=30,
             pool_timeout=60,

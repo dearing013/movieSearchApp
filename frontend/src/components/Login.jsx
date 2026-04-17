@@ -1,8 +1,7 @@
 import axios from "axios";
-import React, { useState } from "react"
-import PopUpModal from '../components/PopUpModal';
+import { useState } from "react"
 import { useNavigate } from "react-router-dom";
-import { Grid,Paper, Typography,Link } from '@mui/material'
+import { Grid,Paper, Typography} from '@mui/material'
 import { useDispatch } from 'react-redux';
 import {login} from "./Stores/authSlice";
 
@@ -15,14 +14,12 @@ function Login () {
 
     const [email,setEmail] = useState("");
     const [description,setDescription] = useState("");
+    const [textColor,setTextColor] = useState("")
     const [password,setPassword] = useState("")
     const [emailError,setEmailError] = useState("");
-    const [openModal,setOpenModal] = useState(false);
 
     
     const paperStyle={padding :20,height:'70vh',width:280, margin:"20px auto"}
-    const avatarStyle={backgroundColor:'#1bbd7e'}
-    const btnstyle={margin:'8px 0'}
 
     
     const API_URL = process.env.REACT_APP_API_URL;
@@ -42,10 +39,8 @@ function Login () {
             dispatch(login({ user: res.data[0] }));
             localStorage.setItem("loggedIn",true)
             localStorage.setItem("userName",res.data[0].username)
-            console.log("Thres",res.data[0].id)
             localStorage.setItem("userId",res.data[0].id)
             navigate("/")
-            console.log("thesresult",res)
         }
         catch (ex) {
             console.log("login failed",ex)

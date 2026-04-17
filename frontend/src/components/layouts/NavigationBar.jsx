@@ -13,6 +13,7 @@ import { NavLink,useNavigate } from "react-router-dom";
 import { StoreContext } from "../Stores/ContextStore";
 import { useDispatch } from 'react-redux';
 import {logout } from '../Stores/authSlice';
+import { useSelector } from "react-redux";
 
   
 // const pages = [
@@ -29,6 +30,7 @@ const NavigationBar = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch();
   const [state, setState] = useContext(StoreContext);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const logOff = () => {
     console.log("logout")
@@ -65,7 +67,7 @@ const NavigationBar = () => {
           >
             <Typography variant="h6">Movie and TV Search</Typography>
             <Stack direction="row" gap={3}>
-              {window.location.pathname != "/Login" && localStorage.loggedIn == 'false' ? 
+              {!isLoggedIn && window.location.hash != "#/Login" ? 
                  <Button sx={{marginRight:"15px",
                     fontSize: 14.5,
                     backgroundColor: "black", 
@@ -74,7 +76,7 @@ const NavigationBar = () => {
                       backgroundColor: "grey",
                     }
                     }} onClick={logIn}>Login</Button>  
-                    : window.location.pathname != "/Login" && localStorage.loggedIn == 'true' ? <Button sx={{ 
+                    : isLoggedIn ?  <Button sx={{ 
                     marginRight:"15px",
                     fontSize: 14.5,
                     backgroundColor: "black", 
@@ -83,11 +85,23 @@ const NavigationBar = () => {
                       backgroundColor: "grey",
                     }
                     
-                  }} onClick={logOff} >Logout</Button> : null }
-                  {window.location.pathname == "/Login" ? <Button onClick={navigateToHome}>Go Home</Button> : null }
-  
+                  }} onClick={logOff} >Logout</Button>  : null }
+
+                  {!isLoggedIn && window.location.hash != "#/" ?
+                    <Button sx={{
+                    marginRight:"17px",
+                    fontSize: 16.5,
+                    backgroundColor: "black", 
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "grey",
+                    }
+                   }} onClick={navigateToHome}>Go Home</Button> : null }
+                   
+                 
             </Stack>
           </Stack>
+          <br></br>{isLoggedIn ? <Typography>Welcome {localStorage.userName} </Typography> : null}
         </Toolbar>
       </Container>
     </AppBar>

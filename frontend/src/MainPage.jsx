@@ -1,4 +1,4 @@
-import React, {useState,useEffect} from "react";
+import {useState,useEffect} from "react";
 import NavigationBar from "./components/layouts/NavigationBar";
 import SearchBox from "./components/SearchBox";
 import MovieList from "./components/MovieList";
@@ -16,25 +16,25 @@ function MainPage () {
     const [favourites,setFavourites] = useState([]);
     const [openModal,setOpenModal] = useState(false);
     const [description,setDescription] = useState("");
+    const [textColor,setTextColor] = useState("")
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
     
+    console.log("logged",isLoggedIn)
     const API_URL = process.env.REACT_APP_API_URL;
     const OMDB_URL = process.env.REACT_APP_OMDB_URL;
 
     console.log("env",process.env)
 
 
-    const saveFavouriteMovie = (movie) => {
+    const saveFavouriteMovie = async (movie) => {
     
         if (localStorage.loggedIn == 'true'){
             const newFavouriteList = [...favourites, movie];
-            console.log("thelist",newFavouriteList)
             setFavourites(newFavouriteList);
             saveToLocalStorage(newFavouriteList);
             const selectedMovie = newFavouriteList.filter(
                 (favourite) => favourite.imdbID == movie.imdbID
             )
-                console.log("theselected",selectedMovie)
         
             const normalized = selectedMovie[0].Year.replace(/[–—]/g, "-");
             let [startYear, endYear] = normalized.split("-").map(y => parseInt(y.trim(), 10));
@@ -43,12 +43,20 @@ function MainPage () {
            
 
             try {
-                axios.post(`${API_URL}/movieSearch/movies/saveMovie?title=${selectedMovie[0].Title}&startYear=${startYear}&endYear=${endYear}&imdbid=${selectedMovie[0].imdbID}&poster=${selectedMovie[0].Poster}&userId=${localStorage.userId}`,
+            const res = await axios.post(`${API_URL}/movieSearch/movies/saveMovie?title=${selectedMovie[0].Title}&startYear=${startYear}&endYear=${endYear}&imdbid=${selectedMovie[0].imdbID}&poster=${selectedMovie[0].Poster}&userId=${localStorage.userId}`,
                 {
                     headers: {'Accept': 'application/json','Content-Type': 'application/json'}   
                 }
             )
-            setDescription("Movie Saved Successfully")
+            console.log("TESTING",res)
+            if (res.data == "movie already in favorites"){
+                setTextColor("red")
+                setDescription("Unable to save. Movie already in favorites")
+            }
+            else {
+                setTextColor("green")
+                setDescription("Movie Saved Successfully")
+            }
             setOpenModal(true);
             }
         catch (ex){
@@ -57,6 +65,7 @@ function MainPage () {
     
         }
         else {
+            setTextColor("red")
             setDescription("Please login to save movies to favourites")
             setOpenModal(true);
         }
@@ -100,7 +109,7 @@ function MainPage () {
         </div>
         <SearchBox searchValue={searchValue} setSearchValue={setSearchValue} />
                 <div className='image-container d-flex justify-content space-between m-4 '>
-                    <PopUpModal open={openModal} description={description}  onClose={() => setOpenModal(false)} /> 
+                    <PopUpModal open={openModal} color={textColor} description={description}  onClose={() => setOpenModal(false)} /> 
                     <MovieList movies={movies} page={"results"} favourite={AddFavourite} handleFavouriteClick={saveFavouriteMovie}/>
                 </div>
                 {isLoggedIn ?

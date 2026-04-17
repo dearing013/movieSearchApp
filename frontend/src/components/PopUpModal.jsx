@@ -41,7 +41,7 @@ function PopUpModal (props) {
 
             <Box sx={style}>
             <div style={{display:"flex",flexDirection: "column",marginLeft: "140px"}}>
-                <label style={{color: "green",fontSize: "20px"}}>{props.description}</label>
+                <label style={{color: props.color,fontSize: "20px"}}>{props.description}</label>
             </div>
             <br></br>
             <div style={{marginLeft: "210px"}}>

@@ -1,5 +1,6 @@
 import aiohttp
 from fastapi import APIRouter
+import pandas as pd
 from fastapi.params import Depends
 from sqlalchemy import insert, delete, select,or_
 from data.connection_pool import requests_session,aiohttp_session
@@ -46,6 +47,9 @@ def saveMovieToDb(title: str,startYear:str,endYear:str,imdbid:str,poster:str,use
 
     exists = movie_session.query(movie_session.query(MovieDetails).filter(
            MovieDetails.title == title).exists()).scalar()
+    
+    if exists:
+        return "movie already in favorites"
 
     if not exists:
         q = insert(MovieDetails).values(title=title,start_year=startYear,end_year=endYear,imdbID=imdbid,poster=poster,user_id=userId)
@@ -54,7 +58,7 @@ def saveMovieToDb(title: str,startYear:str,endYear:str,imdbid:str,poster:str,use
         movie_session.commit()
         movie_session.close()
 
-        return {"movie successfully added"}
+        return "movie successfully added"
 
 @router.delete(
     "/deleteMovie",
@@ -184,6 +188,12 @@ def get_movies_by_user(userId: int,movie_db: Session = Depends(get_movie_db)):
 
     q = select(MovieDetails).where(MovieDetails.user_id == userId)
     res = movie_session.execute(q)
+
+    
+    df = pd.read_sql(q,movie_session.bind)
+
+    print ("Whatisdf",df)
+
 
     rows = res.fetchall()
     
