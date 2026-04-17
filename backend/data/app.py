@@ -97,13 +97,19 @@ def get_app():
             app.state.movie_db_factory = movie_factory
             app.state.user_db_factory = user_factory
 
-            with movie_engine.begin() as conn:
-                conn.execute(text('CREATE SCHEMA IF NOT EXISTS "movies"'))
-            with user_engine.begin() as conn:
-                conn.execute(text('CREATE SCHEMA IF NOT EXISTS "users"'))
-            logger.info("Creating tables")
-            movie_models.movie_Base.metadata.create_all(bind=movie_engine)
-            user_models.user_Base.metadata.create_all(bind=user_engine)
+            try:
+                with movie_engine.begin() as conn:
+                    conn.execute(text('CREATE SCHEMA IF NOT EXISTS "movies"'))
+
+                with user_engine.begin() as conn:
+                    conn.execute(text('CREATE SCHEMA IF NOT EXISTS "users"'))
+
+                movie_models.movie_Base.metadata.create_all(bind=movie_engine)
+                user_models.user_Base.metadata.create_all(bind=user_engine)
+
+            except Exception as e:
+                print("DB INIT ERROR:", e, flush=True)
+                raise
 
         except Exception as e:
             print("ITFAILEd",e)
