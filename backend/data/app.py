@@ -63,45 +63,50 @@ def get_app():
 
         load_dotenv()
 
-        db_url = os.environ.get(
-            "DATABASE_URL"
-        )
-        
-        if not db_url:
-            raise ValueError("DATABASE_URL is not set")
-        
-        connect_args = {}
+        try:
+            print("THEVARIABLE",os.environ.get("DATABASE_URL"))
+            db_url = os.environ.get(
+                "DATABASE_URL"
+            )
+            
+            print("DB URL:", db_url)
+            if not db_url:
+                raise ValueError("DATABASE_URL is not set")
+            
+            connect_args = {}
 
-        if "localhost" not in db_url:
-            connect_args["sslmode"] = "require"
+            if "localhost" not in db_url:
+                connect_args["sslmode"] = "require"
 
-        print("DB URL:", db_url)
-        movie_engine: Engine = create_engine(
-            db_url,
-            pool_pre_ping=True,
-            connect_args=connect_args,
-            pool_size=20,
-            max_overflow=30,
-            pool_timeout=60,
-        )
+            movie_engine: Engine = create_engine(
+                db_url,
+                pool_pre_ping=True,
+                connect_args=connect_args,
+                pool_size=20,
+                max_overflow=30,
+                pool_timeout=60,
+            )
 
-        user_engine: Engined = movie_engine
-        movie_factory = sessionmaker(movie_engine)
-        user_factory = sessionmaker(user_engine)
+            user_engine: Engined = movie_engine
+            movie_factory = sessionmaker(movie_engine)
+            user_factory = sessionmaker(user_engine)
 
-        app.state.movie_db_engine = movie_engine
-        app.state.user_db_engine = user_engine
+            app.state.movie_db_engine = movie_engine
+            app.state.user_db_engine = user_engine
 
-        app.state.movie_db_factory = movie_factory
-        app.state.user_db_factory = user_factory
+            app.state.movie_db_factory = movie_factory
+            app.state.user_db_factory = user_factory
 
-        with movie_engine.begin() as conn:
-            conn.execute(text('CREATE SCHEMA IF NOT EXISTS "movies"'))
-        with user_engine.begin() as conn:
-            conn.execute(text('CREATE SCHEMA IF NOT EXISTS "users"'))
-        logger.info("Creating tables")
-        movie_models.movie_Base.metadata.create_all(bind=movie_engine)
-        user_models.user_Base.metadata.create_all(bind=user_engine)
+            with movie_engine.begin() as conn:
+                conn.execute(text('CREATE SCHEMA IF NOT EXISTS "movies"'))
+            with user_engine.begin() as conn:
+                conn.execute(text('CREATE SCHEMA IF NOT EXISTS "users"'))
+            logger.info("Creating tables")
+            movie_models.movie_Base.metadata.create_all(bind=movie_engine)
+            user_models.user_Base.metadata.create_all(bind=user_engine)
+
+        except Exception as e:
+            print("ITFAILEd",e)
 
     @root_app.on_event("startup")
     def start_requests_session():
