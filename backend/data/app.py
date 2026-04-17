@@ -87,7 +87,7 @@ def get_app():
                 pool_timeout=60,
             )
             print("createdengine")
-            user_engine: Engined = movie_engine
+            user_engine: Engine = movie_engine
             movie_factory = sessionmaker(movie_engine)
             user_factory = sessionmaker(user_engine)
 
