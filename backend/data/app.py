@@ -109,6 +109,7 @@ def get_app():
 
             except Exception as e:
                 print("DB INIT ERROR:", e, flush=True)
+                traceback.print_exc()
                 raise
 
         except Exception as e:
