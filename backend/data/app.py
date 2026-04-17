@@ -107,6 +107,7 @@ def get_app():
 
         except Exception as e:
             print("ITFAILEd",e)
+            raise
 
     @root_app.on_event("startup")
     def start_requests_session():
