@@ -18,7 +18,7 @@ function Register () {
     const registerUser = async () => {
         try {
             await axios.post(`${API_URL}/movieSearch/users/register`, 
-            JSON.stringify({username,email,password}),
+            {username,email,password},
             {
                 headers: {'Accept': 'application/json','Content-Type': 'application/json'},   
             })
