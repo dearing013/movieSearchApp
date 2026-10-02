@@ -56,8 +56,8 @@ function Register () {
               <input onChange={(e) => setEmail(e.target.value)} type="text"></input>
              {/* <input  onChange={(e) => setEmail(e.target.value)} type="text" style={{width: "250px"}}></input> */}
             {/* <input  onChange={(e) => setPassword(e.target.value)} type="password" style={{width: "250px"}} ></input> */}
-              <label>password</label><input onChange={(e) => setPassword(e.target.value)} type="text"></input>
-            <label>Confirm Password</label><input type="text"></input>
+              <label>password</label><input onChange={(e) => setPassword(e.target.value)} type="password"></input>
+            <label>Confirm Password</label><input type="password"></input>
      
             {errorMessage}
           <button onClick={registerUser}>Register</button>

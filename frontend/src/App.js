@@ -13,6 +13,9 @@ import PopUpModal from './components/PopUpModal';
 import Register from './components/Register';
 import NavigationBar from './components/layouts/NavigationBar';
 import MainPage from './MainPage';
+import { useAxiosInterceptors } from './customAxiosInterceptor';
+import Reports from './components/Reports/Reports';
+
 
 const App = () => {
   
@@ -25,6 +28,7 @@ const App = () => {
   const [moviesList,setMoviesList] = useState(false)
   const [state,setState] = useContext(StoreContext)
 
+  useAxiosInterceptors()
   
   const [isAuthenticated, setIsAuthenticated] = useState(
 	() => JSON.parse(localStorage.getItem('loggedIn')) 
@@ -54,8 +58,9 @@ const App = () => {
 	
 	
 	return (
-	  <div className='container-fluid movie-app'>
+	  <div  style={{ backgroundColor: '#b0aeaeff', minHeight: '100vh' }}>
 		<NavigationBar />
+		<PopUpModal  /> 
       <div className='row d-flex align-items-center mt-4 mb-4'>
 			{/* <MovieListHeading heading='Movies' updateFavouritesShown={setFavouritesShown} /> */}
         
@@ -63,7 +68,9 @@ const App = () => {
 		<Routes>
 			<Route path='/Login' element={<Login />} />
 			<Route path='/Register' element={<Register />} />
+			<Route path="/Reports" element={<Reports />} />
 			<Route path='/' element={<MainPage />} />
+			<Route path='/Favourites' element={<FavouriteMovies />} />
 		</Routes>
 			</div>
 	);

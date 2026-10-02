@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select,delete
 from data.db import get_user_db
 from data.models.user_models import UserDetails
-from data.utils import get_hashed_password,verify_password
+from datetime import datetime, timedelta
+from jose import JWTError, jwt
+from data.utils import get_hashed_password,verify_password, create_access_token, create_refresh_token,SECRET_KEY,ALGORITHM
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -27,7 +29,8 @@ def register_user(user: UserCreate,session: Session = Depends(get_user_db)):
 
     return {"message":"user created successfully"}
 
-
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+REFRESH_TOKEN_EXPIRE_MINUTES = 60  * 24 * 7 # 7 days
 @router.post('/login' )
 def login(request: requestdetails, db: Session = Depends(get_user_db)):
     user = db.query(UserDetails).filter(UserDetails.email == request.email).first()
@@ -39,8 +42,23 @@ def login(request: requestdetails, db: Session = Depends(get_user_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect password"
         )
-    return {user}
 
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    refresh_token_expires = timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
+    refresh_token = create_refresh_token(data={"sub": user.email}, expires_delta=refresh_token_expires)
+
+    print("checking",user)
+    # 2. Return the token along with the token type
+    return {
+        "access_token": access_token, 
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+        "user": user
+    }
+   
 
 @router.get("/getUserById",
     status_code=200,
@@ -101,7 +119,20 @@ def delete_user_by_id(userId: int,user_db: Session = Depends(get_user_db)):
     # return {"user successfully deleted"}
 
     
-
+@router.post("/refresh")
+async def refresh_token(refresh_token: str):
+    try:
+        # Decode and validate the refresh token
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        print("thepayld",payload.get("sub"))
+        username = payload.get("sub")
+        
+        # Issue a new access token
+        new_access_token = create_access_token(data={"sub": username})
+        new_refresh_token = create_refresh_token(data={"sub": username})
+        return {"access_token": new_access_token,"refresh_token": new_refresh_token}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
     
 
 # @router.post("/changePassword")

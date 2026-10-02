@@ -3,7 +3,8 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { Grid,Paper, Typography} from '@mui/material'
 import { useDispatch } from 'react-redux';
-import {login} from "./Stores/authSlice";
+import {login, setFavourites} from "./Stores/authSlice";
+import { api } from "./api/apiMethods";
 
 
 function Login () {
@@ -18,14 +19,10 @@ function Login () {
     const [password,setPassword] = useState("")
     const [emailError,setEmailError] = useState("");
 
-    
     const paperStyle={padding :20,height:'70vh',width:280, margin:"20px auto"}
 
     
     const API_URL = process.env.REACT_APP_API_URL;
-
-
-
 
     const loginUser = async () => {
 
@@ -35,11 +32,12 @@ function Login () {
             {
                 headers: {'Accept': 'application/json','Content-Type': 'application/json'},   
             })
-            console.log(res.data[0])
-            dispatch(login({ user: res.data[0] }));
+            dispatch(login({ user: res.data["user"] }));
             localStorage.setItem("loggedIn",true)
-            localStorage.setItem("userName",res.data[0].username)
-            localStorage.setItem("userId",res.data[0].id)
+            localStorage.setItem("userName",res.data["user"].username)
+            localStorage.setItem("userId",res.data["user"].id)
+            localStorage.setItem("authToken",res.data["access_token"])
+            localStorage.setItem("refresh_token",res.data["refresh_token"])
             navigate("/")
         }
         catch (ex) {
@@ -54,12 +52,6 @@ function Login () {
         }
     }
 
-    const logOutUser = async () => {
-        console.log("logout")
-
-        axios.post("/logout")
-        navigate("/home")
-    }
 
     const goToRegister = async () => {
         navigate("/register")

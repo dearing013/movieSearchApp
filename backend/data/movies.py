@@ -1,14 +1,21 @@
 import aiohttp
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 import pandas as pd
 from fastapi.params import Depends
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import insert, delete, select,or_
 from data.connection_pool import requests_session,aiohttp_session
 from data.models.movie_models import MovieDetails
 from sqlalchemy.orm import sessionmaker, Session
 from data.db import get_movie_db,get_user_db
+from jose import JWTError, jwt
+from jose.exceptions import ExpiredSignatureError
+from data.utils import SECRET_KEY,ALGORITHM
 
 router = APIRouter(prefix="/movies", tags=["movies"])
+
+# Define the OAuth2 scheme
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 class Movies:
 
@@ -41,7 +48,21 @@ def displayMovie(searchedMovie: str):
     status_code=200,
     summary="save movie to db"
 )
-def saveMovieToDb(title: str,startYear:str,endYear:str,imdbid:str,poster:str,userId: int,movie_db: Session = Depends(get_movie_db)):
+def saveMovieToDb(title: str,startYear:str,endYear:str,imdbid:str,poster:str,userId: int,movie_db: Session = Depends(get_movie_db),token: str = Depends(oauth2_scheme)):
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        # Decode and verify the token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
 
     movie_session = movie_db
 
@@ -68,7 +89,22 @@ def saveMovieToDb(title: str,startYear:str,endYear:str,imdbid:str,poster:str,use
         "404": dict(description="Movie Not Found"),
     },
 )
-def deleteMovie(title: str,movie_db: Session = Depends(get_movie_db)):
+def deleteMovie(title: str,movie_db: Session = Depends(get_movie_db),token: str = Depends(oauth2_scheme)):
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        # Decode and verify the token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except ExpiredSignatureError:
+        raise credentials_exception
+
 
     movie_session = movie_db
 
@@ -170,7 +206,6 @@ def get_movies_by_range(start_year: int,end_year: int,movie_db: Session = Depend
 
     return results
 
-
 @router.get(
     "/getMoviesByUser",
     status_code=200,
@@ -180,7 +215,23 @@ def get_movies_by_range(start_year: int,end_year: int,movie_db: Session = Depend
     },
 )
 
-def get_movies_by_user(userId: int,movie_db: Session = Depends(get_movie_db)):
+def get_movies_by_user(userId: int,movie_db: Session = Depends(get_movie_db),token: str = Depends(oauth2_scheme)):
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        # Decode and verify the token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        print("usernameis",username)
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
 
     results = []
 
@@ -191,9 +242,6 @@ def get_movies_by_user(userId: int,movie_db: Session = Depends(get_movie_db)):
 
     
     df = pd.read_sql(q,movie_session.bind)
-
-    print ("Whatisdf",df)
-
 
     rows = res.fetchall()
     

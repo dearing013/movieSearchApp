@@ -5,69 +5,94 @@ import MovieList from "./components/MovieList";
 import AddFavourite from './components/AddToFavorites';
 import axios from "axios";
 import FavouriteMovies from './components/FavouriteMovies';
-import PopUpModal from "./components/PopUpModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {axiosInstance} from "./customAxiosInterceptor"
+import { addFavourite } from "./components/Stores/authSlice";
+import { openModal } from "./components/Stores/modalSlice";
+import { api } from "./components/api/apiMethods";
 
 function MainPage () {
 
     const [movies, setMovies] = useState([]);
     const [searchValue, setSearchValue] = useState('');
-    const [moviesList,setMoviesList] = useState(false);
     const [favourites,setFavourites] = useState([]);
-    const [openModal,setOpenModal] = useState(false);
-    const [description,setDescription] = useState("");
-    const [textColor,setTextColor] = useState("")
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
     
-    console.log("logged",isLoggedIn)
     const API_URL = process.env.REACT_APP_API_URL;
     const OMDB_URL = process.env.REACT_APP_OMDB_URL;
 
-    console.log("env",process.env)
-
+    const dispatch = useDispatch()
 
     const saveFavouriteMovie = async (movie) => {
     
-        if (localStorage.loggedIn == 'true'){
-            const newFavouriteList = [...favourites, movie];
+        if (isLoggedIn){
+
+        try {
+            dispatch(addFavourite(movie));
+        } catch (err) {
+            console.error("dispatch addFavourite error", err);
+        }
+
+         // ensure favourites is an array
+        const currentFavourites = Array.isArray(favourites) ? favourites : [];
+
+        // avoid duplicates
+        const exists = currentFavourites.some(
+            (f) =>
+                (f?.imdbID ?? f?.id ?? f?.Title ?? f?.title) ===
+                (movie?.imdbID ?? movie?.id ?? movie?.Title ?? movie?.title)
+        );
+        const newFavouriteList = exists ? currentFavourites : [...currentFavourites, movie];
+
+        if (!exists) {
             setFavourites(newFavouriteList);
             saveToLocalStorage(newFavouriteList);
-            const selectedMovie = newFavouriteList.filter(
-                (favourite) => favourite.imdbID == movie.imdbID
-            )
+        }
+
         
-            const normalized = selectedMovie[0].Year.replace(/[–—]/g, "-");
-            let [startYear, endYear] = normalized.split("-").map(y => parseInt(y.trim(), 10));
-            if (!endYear) endYear = startYear;
-            
-           
+         // find the saved movie object (not an array)
+        const selectedMovie =
+            newFavouriteList.find(
+                (f) =>
+                    (f?.imdbID ?? f?.id ?? f?.Title ?? f?.title) ===
+                    (movie?.imdbID ?? movie?.id ?? movie?.Title ?? movie?.title)
+            ) || movie;
+
+            // safe Year handling
+            const yearRaw = (selectedMovie?.Year ?? selectedMovie?.year ?? "").toString();
+            const normalized = yearRaw.replace(/[–—]/g, "-");
+            let [startYearStr, endYearStr] = normalized.split("-").map((s) => (s || "").trim());
+            let startYear = parseInt(startYearStr, 10);
+            let endYear = parseInt(endYearStr, 10);
+            if (Number.isNaN(startYear)) startYear = undefined;
+            if (Number.isNaN(endYear) || !endYear) endYear = startYear;
+
+            const title = selectedMovie?.Title ?? selectedMovie?.title ?? "";
+            const imdbid = selectedMovie?.imdbID ?? selectedMovie?.id ?? "";
+            const poster = selectedMovie?.Poster ?? selectedMovie?.poster ?? "";
+
 
             try {
-            const res = await axios.post(`${API_URL}/movieSearch/movies/saveMovie?title=${selectedMovie[0].Title}&startYear=${startYear}&endYear=${endYear}&imdbid=${selectedMovie[0].imdbID}&poster=${selectedMovie[0].Poster}&userId=${localStorage.userId}`,
+             const res = await api.post(`/movieSearch/movies/saveMovie?title=${encodeURIComponent(title)}&startYear=${startYear}&endYear=${endYear}&imdbid=${imdbid}&poster=${poster}&userId=${localStorage.userId}`,
                 {
                     headers: {'Accept': 'application/json','Content-Type': 'application/json'}   
                 }
             )
-            console.log("TESTING",res)
-            if (res.data == "movie already in favorites"){
-                setTextColor("red")
-                setDescription("Unable to save. Movie already in favorites")
+
+            if (res === "movie already in favorites"){
+                dispatch(openModal({description:"Unable to save. Movie already in favourites",color: "red"}))   
             }
             else {
-                setTextColor("green")
-                setDescription("Movie Saved Successfully")
+                dispatch(openModal({ description: "Movie Added Successfully",color:"green"}))   
             }
-            setOpenModal(true);
             }
         catch (ex){
-            console.log("error saving movie")
+            console.log("error saving movie",ex)
         }
     
         }
         else {
-            setTextColor("red")
-            setDescription("Please login to save movies to favourites")
-            setOpenModal(true);
+            dispatch(openModal({description:"Please login to save movies to favourites",color: "red"}))   
         }
     }
 
@@ -78,11 +103,9 @@ function MainPage () {
         try {
        
             const response = await fetch(url)
-            console.log("help",response)
             const responseJson = await response.json();
     
             if (responseJson.Search != null) {
-                console.log("search",responseJson.Search)
                 setMovies(responseJson.Search);
             }
         } catch (e) {
@@ -92,7 +115,6 @@ function MainPage () {
 
     useEffect(() => {
         getMovieRequest(searchValue);
-        console.log("Seachvalue",searchValue)
     }, [searchValue]);
 
     
@@ -102,18 +124,14 @@ function MainPage () {
 
     return (
         <div className='container-fluid movie-app'>
-            <NavigationBar />
+        
         <div className='row d-flex align-items-center mt-4 mb-4'>
-                {/* <MovieListHeading heading='Movies' updateFavouritesShown={setFavouritesShown} /> */}
-            
+              <SearchBox searchValue={searchValue} setSearchValue={setSearchValue} placeholder="Search for a movie or tv show" />
         </div>
-        <SearchBox searchValue={searchValue} setSearchValue={setSearchValue} />
-                <div className='image-container d-flex justify-content space-between m-4 '>
-                    <PopUpModal open={openModal} color={textColor} description={description}  onClose={() => setOpenModal(false)} /> 
+    
+        
                     <MovieList movies={movies} page={"results"} favourite={AddFavourite} handleFavouriteClick={saveFavouriteMovie}/>
-                </div>
-                {isLoggedIn ?
-                <FavouriteMovies updates={favourites} /> : null }
+    
         </div>
     )
 }

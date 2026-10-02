@@ -17,7 +17,7 @@ body {
 
 .image-container:hover {
 	cursor: pointer;
-	transform: scale(1.1);
+	/* transform: scale(1.1); */
 }
 
 .image-container:hover .overlay {
@@ -38,4 +38,9 @@ body {
 	font-size: 20px;
 	padding: 20px;
 	text-align: center;
+}
+
+.image-container {
+  width: 400px; /* Adjust this number to your preferred movie card size */
+  max-width: 100%;
 }

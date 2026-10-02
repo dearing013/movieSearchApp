@@ -2,13 +2,15 @@ import os
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Union, Any
-# from jose import jwt
+import jwt
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
+ACCESS_TOKEN_EXPIRE_MINUTES = 5  # 30 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
+SECRET_KEY = "your-secret-key" # Keep this safe!
 ALGORITHM = "HS256"
-JWT_SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"   # should be kept secret
-JWT_REFRESH_SECRET_KEY = "13ugfdfgh@#$%^@&jkl45678902"
+# ALGORITHM = "HS256"
+# JWT_SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"   # should be kept secret
+# JWT_REFRESH_SECRET_KEY = "13ugfdfgh@#$%^@&jkl45678902"
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -21,6 +23,21 @@ def verify_password(password: str, hashed_pass: str) -> bool:
     print ("hashedversion",hashed_pass)
     return password_context.verify(password, hashed_pass)
 
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    # expire = ACCESS_TOKEN_EXPIRE_MINUTES
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def create_refresh_token(data:dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
+    # expire = ACCESS_TOKEN_EXPIRE_MINUTES
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 # def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> str:
 #     if expires_delta is not None:
 #         expires_delta = datetime.utcnow() + expires_delta
